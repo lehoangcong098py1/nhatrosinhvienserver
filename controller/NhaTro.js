@@ -93,7 +93,7 @@ function getpostidquan(req, res, next) {
   FROM quanlynhatro01.tbl_chitietnt,quanlynhatro01.tbl_nhatro
   where tbl_nhatro.idNhatro=tbl_chitietnt.idNhatro and tbl_nhatro.idQuan=${req.params.idQuan} and Sate=1;`, function (err, rows) {
       if (err) {
-        res.status(201).json({data:'Error'});
+        res.status(201).json({data:'1'});
       } else {
         var dict = new Object();
         var dict1 = [];
@@ -109,16 +109,19 @@ function getpostidquan(req, res, next) {
           dict1.sort();
         } 
         var dict2=[] 
+        var start1 = 0;
         for(var h=start;h<5;h++)
         {
-          for(var k=start;k<rows.length;k++)
+          for(var k=start1;k<rows.length;k++)
           {
             if(dict1[h]==dict[rows[k].idNhatro]){
               dict2[h]=rows[k].idNhatro;
+              start1=k+1;
               break;
             }
           }
         }
+        console.log(dict2)
         var query = conn.query(`Select DISTINCT tbl_nhatro.idNhatro, Title, Tenchutro,Sdt,Diachi,idQuan,
         idThanhpho,LocalX,LocalY,date_format(Date,"%Y-%m-%d") as date,Dientich,Phong,Nhavesinh,Mota,
         Gia,Maylanh,Giuxe,Nuocnong,Dien,Nuoc,Loainha,img,wifi,gio,chungchu,round(danhgia.vote,1) as Vote
@@ -130,7 +133,7 @@ function getpostidquan(req, res, next) {
         or tbl_nhatro.idNhatro= ${dict2[2]} or tbl_nhatro.idNhatro= ${dict2[3]} or tbl_nhatro.idNhatro= ${dict2[4]}) and Sate=1
         group by quanlynhatro01.tbl_nhatro.idNhatro;`, function (err, rowss) {
         if (err) {
-          res.status(201).json({data:'Error'});
+          res.status(201).json({data:'2'});
         } else {
           res.status(200).json(rowss);
         }
@@ -318,6 +321,7 @@ function LoginGoogle(req,res,next){
                       }
                       else{
                         var token = jwt.sign({ten:Username},'abc',{algorithm:'HS256',expiresIn: '3h'});
+                        console.log(rowsss[0]);
                         return res.status(200).json({access_token:token,...rowsss[0]});
                       }
                   });
@@ -349,7 +353,6 @@ function LoginGoogle(req,res,next){
                 }
                 else{
                   var id = rows1[0].id
-                  console.log
                   var query=conn.query(`SELECT tbl_user.idUser,Username,Password,Ho,Ten, 
                   date_format(Ngaysinh,"%Y-%m-%d") as NgaySinh,
                   Diachi,Quan as idQuan,ThanhPho as idThanhpho,Sdt,photo
@@ -360,6 +363,7 @@ function LoginGoogle(req,res,next){
                       }
                       else{
                         var token = jwt.sign({ten:req.body.email},'abc',{algorithm:'HS256',expiresIn: '3h'});
+                        console.log(rowss2[0]);
                         return res.status(201).json({access_token:token,...rowss2[0]});
                       }
                   });
